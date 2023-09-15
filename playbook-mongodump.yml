@@ -1,0 +1,54 @@
+#########################################################################################
+#
+# Playbook to take mongodump of database
+#
+# How to execute:
+# ansible-playbook -i inventory --extra-vars "db_name=<db_name>" playbook-mongodump.yml
+#
+# Author: 		Anban Malarvendan
+# License:      GNU GENERAL PUBLIC LICENSE Version 3 +
+#               Section 7: Redistribution/Reuse of this code is permitted under the
+#               GNU v3 license, as an additional term ALL code must carry the
+#               original Author(s) credit in comment form.
+#
+#########################################################################################
+
+- name: "mongodump | Playbook to backup {{ db_name }}"
+  hosts: mongodb
+  tasks:
+    - name: "mongodump | Validate if db_name is defined"
+      assert:
+        that:
+          - db_name is defined
+        fail_msg: "Action failed: db_name variable is undefined."
+        success_msg: "db_name is {{ db_name }}"
+
+    - name: "mongodump | Check available space in /tmp directory"
+      command: df -h /tmp --output=avail | tail -n 1
+      register: tmp_space
+      changed_when: false
+
+    - name: "mongodump | debug /tmp space"
+      debug:
+        var: tmp_space.stdout_lines
+
+    - name: "mongodump | Convert /tmp space to GB"
+      set_fact:
+        tmp_space_gb: "{{ tmp_space.stdout_lines[0] | regex_replace('G', '') | int }}"
+      when: tmp_space.stdout_lines[0] | regex_search('G')
+
+    - name: "mongodump | Fail if /tmp space is less than 30GB"
+      fail:
+        msg: "Insufficient disk space in /tmp directory. Required: 30GB, Available: {{ tmp_space_gb }}GB"
+      when: tmp_space_gb < 30
+
+    - name: "mongodump | Create backup directory"
+      file:
+        path: "{{ file_name }}"
+        state: directory
+      changed_when: false
+
+    - name: "mongodump | Perform MongoDB backup"
+      command: mongodump --db {{ db_name }} --out {{ file_name }}
+      changed_when: true
+
