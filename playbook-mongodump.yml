@@ -2,7 +2,7 @@
 #
 # Playbook to take mongodump of database
 #
-# How to executue:
+# How to execute:
 # ansible-playbook -i inventory --extra-vars "db_name=<db_name>" playbook-mongodump.yml
 #
 # Author:       Anban Malarvendan
