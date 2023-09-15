@@ -36,8 +36,3 @@
     - name: "mongodump | Perform MongoDB backup"
       command: mongodump --db {{ db_name }} --out {{ file_to_be_uploaded }}
       changed_when: true
-
-    - name: "mongodump | Data uploader | Send file to uploader"
-      import_tasks: roles/dco.util.data-uploader/tasks/main.yml
-      vars:
-        file_to_upload: "{{ file_to_be_uploaded }}"
