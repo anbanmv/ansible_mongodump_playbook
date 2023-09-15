@@ -5,7 +5,7 @@
 # How to executue:
 # ansible-playbook -i inventory --extra-vars "db_name=<db_name>" playbook-mongodump.yml
 #
-# Author: 		Anban Malarvendan
+# Author:       Anban Malarvendan
 # License:      GNU GENERAL PUBLIC LICENSE Version 3 +
 #               Section 7: Redistribution/Reuse of this code is permitted under the
 #               GNU v3 license, as an additional term ALL code must carry the
